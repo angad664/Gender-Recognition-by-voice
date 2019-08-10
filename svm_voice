@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Aug  9 19:44:07 2019
+
+@author: angadsingh
+"""
+
+import pandas as pd
+import warnings
+warnings.filterwarnings('ignore')
+
+df = pd.read_csv('voice.csv')
+df.head()
+
+#check number of records
+df.info()
+df.describe()
+
+df.isnull().sum()
+
+df.shape
+
+print("total number of labels: {}". format(df.shape[0]))
+print("Number of males: {}".format(df[df.label == 'male'].shape[0]))
+print("Number of females: {}".format(df[df.label == 'female'].shape[0]))
+
+X = df.iloc[:,:-1]
+y = df.iloc[:,-1]
+print(df.shape)
+print(X.shape)
+
+#feature scaling
+from sklearn.preprocessing import LabelEncoder
+gender_encoder = LabelEncoder()
+y = gender_encoder.fit_transform(y)
+
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+scaler.fit(X)
+X = scaler.transform(X)
+# split train and test
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X,y, test_size = 0.2)
+
+from sklearn.svm import SVC
+from sklearn import metrics
+from sklearn.metrics import confusion_matrix,classification_report
+
+svc_model = SVC()
+svc_model.fit(X_train, y_train)
+y_pred = svc_model.predict(X_test)
+
+print('Accuracy score')
+print(metrics.accuracy_score(y_test,y_pred))
+
+print(confusion_matrix(y_test, y_pred))
+print(classification_report(y_test,y_pred))
